@@ -1,10 +1,13 @@
 var readline = require('readline');
 var parser = require('./parser');
 
-var rl = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout
-});
+// for testing
+var data = require('./data.json');
+
+// var rl = readline.createInterface({
+//     input: process.stdin,
+//     output: process.stdout
+// });
 
 function getCounts(object) {
     var types = [
@@ -195,22 +198,54 @@ function toJsonString(options) {
     return jsonStr;
 }
 
-rl.on('line', function(input) {
-    try {
-        var parsedObject = parser.parse(input);
-        var countMessage = getCounts(parsedObject);
+// for testing
+(function() {
+    // make input data
+    var inputCount = 1000;
+    var testCount = 100;
+    var inputArray = [];
+    var inputString = '';
 
-        var jsonStr = toJsonString({
-            object: parsedObject,
-            tabSize: 4
-        });
-
-        console.log(countMessage);
-        console.log(jsonStr);
-    } catch(exception) {
-        console.log(exception);
-        console.log(exception.message);
+    for (var i = 0; i < inputCount; i++) {
+        inputArray.push(data);
     }
 
-    rl.close();
-});
+    inputString = JSON.stringify(inputArray);
+
+    try {
+        for (var i = 0; i < testCount; i++) {
+            console.log('*test' + (i + 1) + '*');
+
+            console.time('thisParser');
+            var parsedObject = parser.parse(inputString);
+            console.timeEnd('thisParser');
+
+            console.time('builtInParser');
+            var parsedObject = JSON.parse(inputString);
+            console.timeEnd('builtInParser');
+        }
+
+     } catch(exception) {
+         console.log(exception.message);
+     }
+})();
+
+// rl.on('line', function(input) {
+//     try {
+//         var parsedObject = parser.parse(input);
+//         var countMessage = getCounts(parsedObject);
+
+//         var jsonStr = toJsonString({
+//             object: parsedObject,
+//             tabSize: 4
+//         });
+
+//         console.log(countMessage);
+//         console.log(jsonStr);
+//     } catch(exception) {
+//         console.log(exception);
+//         console.log(exception.message);
+//     }
+
+//     rl.close();
+// });
